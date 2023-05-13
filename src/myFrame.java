@@ -1,16 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
 
-public class myFrame implements ActionListener, KeyListener {
+public class myFrame extends JFrame implements ActionListener, KeyListener {
 
     private int [][] board;
     private int [][] level;
-    private JFrame frame;
     private JPanel game;
     private JButton up;
     private JButton left;
@@ -21,19 +17,26 @@ public class myFrame implements ActionListener, KeyListener {
     private int playerX;
     private int playerY;
 
-    public myFrame(int x, int y, int playerXCoord, int playerYCoord) {
+    myFrame(int x, int y, int playerXCoord, int playerYCoord) {
         board = new int[y][x];
-        frame = new JFrame();
         playerX = playerXCoord;
         playerY = playerYCoord;
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(null);
+        level = board;
 
         game = new JPanel();
         game.setLayout(null);
 
-        frame.setName("Sokoban");
+        board[1][1] = 2;
+        board[1][3] = 2;
+        board[3][1] = 4;
+        board[3][3] = 4;
+
+        this.setName("Sokoban");
         game.setSize(board[0].length*50 + 20,board.length*50);
-        frame.setSize(board[0].length*50 + 20,board.length*50 + 200);
-        frame.setResizable(false);
+        this.setSize(board[0].length*50 + 20,board.length*50 + 200);
+        this.setResizable(false);
 
         updateBoard();
         printBoard();
@@ -52,16 +55,14 @@ public class myFrame implements ActionListener, KeyListener {
         down.addActionListener(this);
         right.addActionListener(this);
         reset.addActionListener(this);
-
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(null);
+        this.addKeyListener(this);
 
         buttons.add(up);
         buttons.add(down);
         buttons.add(left);
         buttons.add(right);
         buttons.add(reset);
-        frame.add(game);
+        this.add(game);
 
         up.setBounds(50,0,50,50);
         left.setBounds(0,50,50,50);
@@ -69,9 +70,11 @@ public class myFrame implements ActionListener, KeyListener {
         right.setBounds(100,50,50,50);
         reset.setBounds(0,0,50,50);
 
-        frame.add(buttons);
+        this.add(buttons);
         buttons.setBounds(0,y * 50,150,100);
-        frame.setVisible(true);
+        this.setVisible(true);
+        this.setFocusable(true);
+        this.requestFocus();
     }
     public boolean checkWin(){
         boolean win = true;
@@ -145,31 +148,31 @@ public class myFrame implements ActionListener, KeyListener {
         label.setIcon(box);
     }
     public void updateBoard(){
+        game.removeAll();
         for(int i = 0; i < board.length; i++){
             for(int j = 0; j < board[i].length; j++){
-                if(i ==playerY && j == playerX){
+                if(i == playerY && j == playerX){
                     makePlayerTile(j*50,i*50);
                 }
-                if(board[j][i] == 0) {//air tile
+                else if(board[i][j] == 0) {//air tile
                     makeEmptyTile(j*50, i*50);
                 }
                 /*else if(board[j][i] == 1){//player tile
                     makePlayerTile(j*50,i*50);
                 }*/
-                else if(board[j][i] == 2){//box tile
+                else if(board[i][j] == 2){//box tile
                     makeBoxTile(j*50,i*50);
                 }
-                else if(board[j][i] == 3){//wall tile
+                else if(board[i][j] == 3){//wall tile
                     makeWallTile(j*50,i*50);
                 }
-                else if(board[j][i] == 4){//goal tile
+                else if(board[i][j] == 4){//goal tile
                     makeGoalTile(j*50,i*50);
                 }
-                else if(board[j][i] == 5) {//box on goal tile
+                else if(board[i][j] == 5) {//box on goal tile
                     makeBoxGoalTile(j*50,i*50);
                 }
-
-                else if(board[j][i] == 6) {//player on goal tile
+                else if(board[i][j] == 6) {//player on goal tile
                     makeBoxGoalTile(j*50,i*50);
                 }
             }
@@ -181,121 +184,225 @@ public class myFrame implements ActionListener, KeyListener {
             //winScreen.setSize(game.getWidth(),game.getHeight());
             winMessage.setFont(new Font("Cambria", Font.BOLD,25));
             winMessage.setIcon(winIcon);
-            frame.add(winMessage);
+            this.add(winMessage);
             winMessage.setBounds(200,game.getHeight(), 200, 100);
         }
     }
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == up && playerY >=1 && board[playerY - 1][playerX] != 5 && board[playerY - 1][playerX] != 3){
             if(board[playerY - 1][playerX] == 2){
-                if(playerY - 2 >= 0 && board[playerY - 2][playerX] == 0 || board[playerY - 2][playerX] == 4){
+                if(playerY - 2 >= 0 && (board[playerY - 2][playerX] == 0 || board[playerY - 2][playerX] == 4)){
                     if(board[playerY - 2][playerX] == 4){
                         board[playerY - 2][playerX] = 5;
-                        board[playerY][playerX] = 0;
+                        board[playerY - 1][playerX] = 0;
+                        //board[playerY][playerX] = 0;
                         playerY--;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                     else{
                         board[playerY - 2][playerX] = 2;
-                        board[playerY][playerX] = 0;
+                        board[playerY - 1][playerX] = 0;
                         playerY--;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                 }
             }
             else{
                 System.out.println("up");
-                board[playerY][playerX] = 0;
+                //board[playerY][playerX] = 0;
                 playerY--;
                 printBoard();
-                game.removeAll();
                 updateBoard();
             }
         }
         if(e.getSource() == left && playerX >=1 && board[playerY][playerX - 1] != 5 && board[playerY][playerX - 1] != 3){
             if(board[playerY][playerX - 1] == 2){
-                if(playerX - 2 >= 0 && board[playerY][playerX - 2] == 0 || board[playerY][playerX - 2] == 4){
+                if(playerX - 2 >= 0 && (board[playerY][playerX - 2] == 0 || board[playerY][playerX - 2] == 4)){
                     if(board[playerY][playerX - 2] == 4){
                         board[playerY][playerX - 2] = 5;
-                        board[playerY][playerX] = 0;
+                        board[playerY][playerX - 1] = 0;
                         playerX--;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                     else{
                         board[playerY][playerX - 2] = 2;
-                        board[playerY][playerX] = 0;
+                        board[playerY][playerX - 1] = 0;
                         playerX--;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                 }
             }
             else{
                 System.out.println("left");
-                board[playerY][playerX] = 0;
                 playerX--;
                 printBoard();
-                game.removeAll();
                 updateBoard();
             }
         }
         if(e.getSource() == down && playerY < board.length - 1 && board[playerY + 1][playerX] != 5 && board[playerY + 1][playerX] != 3){
             if(board[playerY + 1][playerX] == 2){
-                if(playerY + 2 < board.length && board[playerY + 2][playerX] == 0 || board[playerY + 2][playerX] == 4){
+                if(playerY + 2 < board.length && (board[playerY + 2][playerX] == 0 || board[playerY + 2][playerX] == 4)){
                     if(board[playerY + 2][playerX] == 4){
                         board[playerY + 2][playerX] = 5;
-                        board[playerY][playerX] = 0;
+                        board[playerY + 1][playerX] = 0;
                         playerY++;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                     else{
                         board[playerY + 2][playerX] = 2;
-                        board[playerY][playerX] = 0;
+                        board[playerY+ 1][playerX] = 0;
                         playerY++;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                 }
             }
             else{
                 System.out.println("down");
-                board[playerY][playerX] = 0;
+                //board[playerY][playerX] = 0;
                 playerY++;
                 printBoard();
-                game.removeAll();
                 updateBoard();
             }
         }
         if(e.getSource() == right && playerX < board[playerY].length - 1 && board[playerY][playerX + 1] != 5 && board[playerY][playerX + 1] != 3){
             if(board[playerY][playerX + 1] == 2){
-                if(playerX + 2 < board.length && board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4){
+                if(playerX + 2 < board.length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
                     if(board[playerY][playerX + 2] == 4){
                         board[playerY][playerX + 2] = 5;
-                        board[playerY][playerX] = 0;
+                        board[playerY][playerX + 1] = 0;
                         playerX++;
                         printBoard();
-                        game.removeAll();
                         updateBoard();
                     }
                     else{
                         board[playerY][playerX + 2] = 2;
-                        board[playerY][playerX] = 0;
+                        board[playerY][playerX + 1] = 0;
                         playerX++;
                         printBoard();
-                        game.removeAll();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("right");
+                playerX++;
+                printBoard();
+                updateBoard();
+            }
+        }
+        else if(e.getSource() == reset){
+            board = level;
+
+            printBoard();
+            updateBoard();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        /*if(e.getKeyCode() == 38 && playerY >=1 && board[playerY - 1][playerX] != 5 && board[playerY - 1][playerX] != 3){
+            if(board[playerY - 1][playerX] == 2){
+                if(playerY - 2 >= 0 && (board[playerY - 2][playerX] == 0 || board[playerY - 2][playerX] == 4)){
+                    if(board[playerY - 2][playerX] == 4){
+                        board[playerY - 2][playerX] = 5;
+                        board[playerY - 1][playerX] = 0;
+                        //board[playerY][playerX] = 0;
+                        playerY--;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY - 2][playerX] = 2;
+                        board[playerY - 1][playerX] = 0;
+                        playerY--;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("up");
+                //board[playerY][playerX] = 0;
+                playerY--;
+                printBoard();
+                updateBoard();
+            }
+        }
+        if(e.getKeyCode() == 37 && playerX >=1 && board[playerY][playerX - 1] != 5 && board[playerY][playerX - 1] != 3){
+            if(board[playerY][playerX - 1] == 2){
+                if(playerX - 2 >= 0 && (board[playerY][playerX - 2] == 0 || board[playerY][playerX - 2] == 4)){
+                    if(board[playerY][playerX - 2] == 4){
+                        board[playerY][playerX - 2] = 5;
+                        board[playerY][playerX - 1] = 0;
+                        playerX--;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY][playerX - 2] = 2;
+                        board[playerY][playerX - 1] = 0;
+                        playerX--;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("left");
+                playerX--;
+                printBoard();
+                updateBoard();
+            }
+        }
+        if(e.getKeyCode() == 40 && playerY < board.length - 1 && board[playerY + 1][playerX] != 5 && board[playerY + 1][playerX] != 3){
+            if(board[playerY + 1][playerX] == 2){
+                if(playerY + 2 < board.length && (board[playerY + 2][playerX] == 0 || board[playerY + 2][playerX] == 4)){
+                    if(board[playerY + 2][playerX] == 4){
+                        board[playerY + 2][playerX] = 5;
+                        board[playerY + 1][playerX] = 0;
+                        playerY++;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY + 2][playerX] = 2;
+                        board[playerY+ 1][playerX] = 0;
+                        playerY++;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("down");
+                //board[playerY][playerX] = 0;
+                playerY++;
+                printBoard();
+                updateBoard();
+            }
+        }
+        if(e.getKeyCode() == 39 && playerX < board[playerY].length - 1 && board[playerY][playerX + 1] != 5 && board[playerY][playerX + 1] != 3){
+            if(board[playerY][playerX + 1] == 2){
+                if(playerX + 2 < board.length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
+                    if(board[playerY][playerX + 2] == 4){
+                        board[playerY][playerX + 2] = 5;
+                        board[playerY][playerX + 1] = 0;
+                        playerX++;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY][playerX + 2] = 2;
+                        board[playerY][playerX + 1] = 0;
+                        playerX++;
+                        printBoard();
                         updateBoard();
                     }
                 }
@@ -305,26 +412,121 @@ public class myFrame implements ActionListener, KeyListener {
                 board[playerY][playerX] = 0;
                 playerX++;
                 printBoard();
-                game.removeAll();
                 updateBoard();
             }
         }
-        else if(e.getSource() == reset){
-            board = level;
-            printBoard();
-            game.removeAll();
-            updateBoard();
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
+        */
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if(e.getKeyCode() == 38 && playerY >=1 && board[playerY - 1][playerX] != 5 && board[playerY - 1][playerX] != 3){
+            if(board[playerY - 1][playerX] == 2){
+                if(playerY - 2 >= 0 && (board[playerY - 2][playerX] == 0 || board[playerY - 2][playerX] == 4)){
+                    if(board[playerY - 2][playerX] == 4){
+                        board[playerY - 2][playerX] = 5;
+                        board[playerY - 1][playerX] = 0;
+                        //board[playerY][playerX] = 0;
+                        playerY--;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY - 2][playerX] = 2;
+                        board[playerY - 1][playerX] = 0;
+                        playerY--;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("up");
+                //board[playerY][playerX] = 0;
+                playerY--;
+                printBoard();
+                updateBoard();
+            }
+        }
+        if(e.getKeyCode() == 37 && playerX >=1 && board[playerY][playerX - 1] != 5 && board[playerY][playerX - 1] != 3){
+            if(board[playerY][playerX - 1] == 2){
+                if(playerX - 2 >= 0 && (board[playerY][playerX - 2] == 0 || board[playerY][playerX - 2] == 4)){
+                    if(board[playerY][playerX - 2] == 4){
+                        board[playerY][playerX - 2] = 5;
+                        board[playerY][playerX - 1] = 0;
+                        playerX--;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY][playerX - 2] = 2;
+                        board[playerY][playerX - 1] = 0;
+                        playerX--;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("left");
+                playerX--;
+                printBoard();
+                updateBoard();
+            }
+        }
+        if(e.getKeyCode() == 40 && playerY < board.length - 1 && board[playerY + 1][playerX] != 5 && board[playerY + 1][playerX] != 3){
+            if(board[playerY + 1][playerX] == 2){
+                if(playerY + 2 < board.length && (board[playerY + 2][playerX] == 0 || board[playerY + 2][playerX] == 4)){
+                    if(board[playerY + 2][playerX] == 4){
+                        board[playerY + 2][playerX] = 5;
+                        board[playerY + 1][playerX] = 0;
+                        playerY++;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY + 2][playerX] = 2;
+                        board[playerY+ 1][playerX] = 0;
+                        playerY++;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("down");
+                //board[playerY][playerX] = 0;
+                playerY++;
+                printBoard();
+                updateBoard();
+            }
+        }
+        if(e.getKeyCode() == 39 && playerX < board[playerY].length - 1 && board[playerY][playerX + 1] != 5 && board[playerY][playerX + 1] != 3){
+            if(board[playerY][playerX + 1] == 2){
+                if(playerX + 2 < board.length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
+                    if(board[playerY][playerX + 2] == 4){
+                        board[playerY][playerX + 2] = 5;
+                        board[playerY][playerX + 1] = 0;
+                        playerX++;
+                        printBoard();
+                        updateBoard();
+                    }
+                    else{
+                        board[playerY][playerX + 2] = 2;
+                        board[playerY][playerX + 1] = 0;
+                        playerX++;
+                        printBoard();
+                        updateBoard();
+                    }
+                }
+            }
+            else{
+                System.out.println("right");
+                playerX++;
+                printBoard();
+                updateBoard();
+            }
+        }
     }
 
     @Override
