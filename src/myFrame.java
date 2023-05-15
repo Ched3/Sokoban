@@ -27,7 +27,12 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         originalY = playerYCoordinate;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
-        level = b;
+        level = new int[b.length][b[0].length];
+        for(int i = 0; i < b.length; i++){
+            for(int j = 0; j < b[0].length; j++){
+                level[i][j] = b[i][j];
+            }
+        }
         game = new JPanel();
         game.setLayout(null);
 
@@ -65,7 +70,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         up.setBounds(50,0,50,50);
         left.setBounds(0,50,50,50);
         down.setBounds(50,50,50,50);
-        right.setBounds(100,50,50,50);
+        right.setBounds (100,50,50,50);
         reset.setBounds(0,0,50,50);
 
         this.add(buttons);
@@ -148,7 +153,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         return win;
     }
     public void printBoard(){
-        for(int[] a: board){
+        for(int[] a: level){
             for(int b: a){
                 System.out.print(b + " ");
             }
@@ -420,7 +425,11 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
             }
         }
         else if(e.getSource() == reset){
-            board = level;
+            int[][] dab = new int[level.length][level[0].length];
+            for(int i = 0; i < level.length; i++){
+                System.arraycopy(level[i], 0, dab[i], 0, level[0].length);
+            }
+            board = dab;
             playerX = originalX;
             playerY = originalY;
             printBoard();
@@ -605,7 +614,11 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
             }
         }
         if(e.getKeyCode() == 82){
-            board = level;
+            int[][] dab = new int[level.length][level[0].length];
+            for(int i = 0; i < level.length; i++){
+                System.arraycopy(level[i], 0, dab[i], 0, level[0].length);
+            }
+            board = dab;
             playerX = originalX;
             playerY = originalY;
             printBoard();
