@@ -37,6 +37,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         makeStartScreen();
     }
     public void makeStartScreen(){
+        removeAllActionKeyListeners();
         this.getContentPane().removeAll();
         this.repaint();
         sokoban = new JLabel("Sokoban");
@@ -59,6 +60,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         this.setVisible(true);
     }
     public void makeLevelSelectScreen(){
+        removeAllActionKeyListeners();
         levels = new JPanel();
         this.getContentPane().removeAll();
         this.repaint();
@@ -120,6 +122,8 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         this.add(levels);
     }
     public void makeLevel(int[][] b, int playerXCoordinate, int playerYCoordinate){
+        removeAllActionKeyListeners();
+
         this.getContentPane().removeAll();
         this.repaint();
         board = b;
@@ -131,9 +135,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         this.setLayout(null);
         level = new int[b.length][b[0].length];
         for(int i = 0; i < b.length; i++){
-            for(int j = 0; j < b[0].length; j++){
-                level[i][j] = b[i][j];
-            }
+            System.arraycopy(b[i], 0, level[i], 0, b[0].length);
         }
         game = new JPanel();
         game.setLayout(null);
@@ -189,8 +191,8 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
     public boolean checkWin(){
         boolean win = true;
         for(int i = 0; i < board.length; i++){
-            for(int j = 0; j < board[0].length; j++){
-                if (board[j][i] == 4) {
+            for(int j = 0; j < board[i].length; j++){
+                if (board[i][j] == 4) {
                     win = false;
                     break;
                 }
@@ -207,7 +209,63 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         }
         System.out.println("player's X = " + playerX + "\nplayer's Y = " + playerY);
     }
-
+    public void removeAllActionKeyListeners(){
+        if(level1 != null){
+            level1.removeActionListener(this);
+        }
+        if(level2 != null){
+            level2.removeActionListener(this);
+        }
+        if(level3 != null){
+            level3.removeActionListener(this);
+        }
+        if(level4 != null){
+            level4.removeActionListener(this);
+        }
+        if(level5 != null){
+            level5.removeActionListener(this);
+        }
+        if(level6 != null){
+            level6.removeActionListener(this);
+        }
+        if(level7 != null){
+            level7.removeActionListener(this);
+        }
+        if(level8 != null){
+            level8.removeActionListener(this);
+        }
+        if(level9 != null){
+            level9.removeActionListener(this);
+        }
+        if(level10 != null){
+            level10.removeActionListener(this);
+        }
+        if(back != null){
+            back.removeActionListener(this);
+        }
+        if(levelBack != null){
+            levelBack.removeActionListener(this);
+        }
+        if(up != null){
+            up.removeActionListener(this);
+        }
+        if(left != null){
+            left.removeActionListener(this);
+        }
+        if(down != null){
+            down.removeActionListener(this);
+        }
+        if(right != null){
+            right.removeActionListener(this);
+        }
+        if(reset != null){
+            reset.removeActionListener(this);
+        }
+        if(start != null){
+            start.removeActionListener(this);
+        }
+        this.removeKeyListener(this);
+    }
     public void makeEmptyTile(int xCoord, int yCoord){
         JPanel tile = new JPanel();
         game.add(tile);
@@ -338,7 +396,6 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                 }
             }
             else{
-                System.out.println("up");
                 playerY--;
                 printBoard();
                 updateBoard();
@@ -371,7 +428,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                     printBoard();
                     updateBoard();
                 }
-                if(playerY - 2 >= 0 && board[playerY - 2][playerX] == 4 ){
+                if(playerX - 2 >= 0 && board[playerY][playerX - 2] == 4 ){
                     board[playerY][playerX - 2] = 5;
                     board[playerY][playerX - 1] = 4;
                     playerX--;
@@ -413,7 +470,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                     printBoard();
                     updateBoard();
                 }
-                if(playerY + 2 < board.length && board[playerY - 2][playerX] == 4 ){
+                if(playerY + 2 < board.length && board[playerY + 2][playerX] == 4 ){
                     board[playerY + 2][playerX] = 5;
                     board[playerY + 1][playerX] = 4;
                     playerY++;
@@ -428,9 +485,9 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                 updateBoard();
             }
         }
-        else if(e.getSource() == right && playerX < board[playerY].length - 1 && board[playerY][playerX + 1] != 3){
+        else if(e.getSource() == right && playerX < board[playerX].length - 1 && board[playerY][playerX + 1] != 3){
             if(board[playerY][playerX + 1] == 2){
-                if(playerX + 2 < board.length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
+                if(playerX + 2 < board[playerX].length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
                     if(board[playerY][playerX + 2] == 4){
                         board[playerY][playerX + 2] = 5;
                         board[playerY][playerX + 1] = 0;
@@ -448,14 +505,14 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                 }
             }
             else if(board[playerY][playerX + 1] == 5){
-                if(playerX + 2 < board.length && board[playerY][playerX + 2] == 0 ){
+                if(playerX + 2 < board[playerX].length && board[playerY][playerX + 2] == 0 ){
                     board[playerY][playerX + 2] = 2;
                     board[playerY][playerX + 1] = 4;
                     playerX++;
                     printBoard();
                     updateBoard();
                 }
-                if(playerY + 2 < board.length && board[playerY - 2][playerX] == 4 ){
+                if(playerX + 2 < board[playerX].length && board[playerY][playerX + 2] == 4 ){
                     board[playerY][playerX + 2] = 5;
                     board[playerY][playerX + 1] = 4;
                     playerX++;
@@ -478,41 +535,104 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
             board = dab;
             playerX = originalX;
             playerY = originalY;
+            if(winMessage != null){
+                this.getContentPane().remove(winMessage);
+            }
             printBoard();
             updateBoard();
-            this.getContentPane().remove(winMessage);
         }
         else if(e.getSource() == start){
             makeLevelSelectScreen();
         }
         else if(e.getSource() == level1){
-            makeLevel(Level.level1,1,1);
+            int[][] tempL1 = new int[Level.level1.length][Level.level1[0].length];
+            for(int i = 0; i < tempL1.length; i++){
+                for(int j = 0; j < tempL1[i].length; j++){
+                    tempL1[i][j] = Level.level1[i][j];
+                }
+            }
+            makeLevel(tempL1,1,1);
         }
         else if(e.getSource() == level2){
-            makeLevel(Level.level2,1,1);
+            int[][] tempL2 = new int[Level.level2.length][Level.level2[0].length];
+            for(int i = 0; i < tempL2.length; i++){
+                for(int j = 0; j < tempL2[i].length; j++){
+                    tempL2[i][j] = Level.level2[i][j];
+                }
+            }
+            makeLevel(tempL2,1,1);
         }
         else if(e.getSource() == level3){
-            makeLevel(Level.level3,1,1);
+            int[][] tempL3 = new int[Level.level3.length][Level.level3[0].length];
+            for(int i = 0; i < tempL3.length; i++){
+                for(int j = 0; j < tempL3[i].length; j++){
+                    tempL3[i][j] = Level.level3[i][j];
+                }
+            }
+            makeLevel(tempL3,1,1);
         }
         else if(e.getSource() == level4){
-            makeLevel(Level.level4,1,1);
+            int[][] tempL4 = new int[Level.level4.length][Level.level4[0].length];
+            for(int i = 0; i < tempL4.length; i++){
+                for(int j = 0; j < tempL4[i].length; j++){
+                    tempL4[i][j] = Level.level4[i][j];
+                }
+            }
+            makeLevel(tempL4,1,1);
         }
         else if(e.getSource() == level5){
-            makeLevel(Level.level5,1,1);
-        }else if(e.getSource() == level6){
-            makeLevel(Level.level6,1,1);
+            int[][] tempL5 = new int[Level.level5.length][Level.level5[0].length];
+            for(int i = 0; i < tempL5.length; i++){
+                for(int j = 0; j < tempL5[i].length; j++){
+                    tempL5[i][j] = Level.level5[i][j];
+                }
+            }
+            makeLevel(tempL5,1,1);
+        }
+        else if(e.getSource() == level6){
+            int[][] tempL6 = new int[Level.level6.length][Level.level6[0].length];
+            for(int i = 0; i < tempL6.length; i++){
+                for(int j = 0; j < tempL6[i].length; j++){
+                    tempL6[i][j] = Level.level6[i][j];
+                }
+            }
+            makeLevel(tempL6,1,1);
         }
         else if(e.getSource() == level7){
-            makeLevel(Level.level7,1,1);
+            int[][] tempL7 = new int[Level.level7.length][Level.level7[0].length];
+            for(int i = 0; i < tempL7.length; i++){
+                for(int j = 0; j < tempL7[i].length; j++){
+                    tempL7[i][j] = Level.level7[i][j];
+                }
+            }
+            makeLevel(tempL7,1,1);
         }
         else if(e.getSource() == level8){
-            makeLevel(Level.level8,1,1);
+            int[][] tempL8 = new int[Level.level8.length][Level.level8[0].length];
+            for(int i = 0; i < tempL8.length; i++){
+                for(int j = 0; j < tempL8[i].length; j++){
+                    tempL8[i][j] = Level.level8[i][j];
+                }
+            }
+            makeLevel(tempL8,1,1);
         }
         else if(e.getSource() == level9){
-            makeLevel(Level.level9,1,1);
+            int[][] tempL9 = new int[Level.level9.length][Level.level9[0].length];
+            for(int i = 0; i < tempL9.length; i++){
+                for(int j = 0; j < tempL9[i].length; j++){
+                    tempL9[i][j] = Level.level9[i][j];
+                }
+            }
+            makeLevel(tempL9,1,1);
         }
         else if(e.getSource() == level10){
-            makeLevel(Level.level10,1,1);
+            int[][] tempL10 = new int[Level.level10.length][Level.level10[0].length];
+            for(int i = 0; i < tempL10.length; i++){
+                for(int j = 0; j < tempL10[i].length; j++){
+                    tempL10[i][j] = Level.level10[i][j];
+                }
+            }
+            makeLevel(tempL10,1,1);
         }
         else if(e.getSource() == back){
             makeStartScreen();
@@ -598,7 +718,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                     printBoard();
                     updateBoard();
                 }
-                if(playerY - 2 >= 0 && board[playerY - 2][playerX] == 4 ){
+                if(playerX - 2 >= 0 && board[playerY][playerX - 2] == 4 ){
                     board[playerY][playerX - 2] = 5;
                     board[playerY][playerX - 1] = 4;
                     playerX--;
@@ -640,7 +760,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                     printBoard();
                     updateBoard();
                 }
-                if(playerY + 2 < board.length && board[playerY - 2][playerX] == 4 ){
+                if(playerY + 2 < board.length && board[playerY + 2][playerX] == 4 ){
                     board[playerY + 2][playerX] = 5;
                     board[playerY + 1][playerX] = 4;
                     playerY++;
@@ -655,9 +775,9 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                 updateBoard();
             }
         }
-        if(e.getKeyCode() == 39 && playerX < board[playerY].length - 1 && board[playerY][playerX + 1] != 3){
+        if(e.getKeyCode() == 39 && playerX < board[playerX].length - 1 && board[playerY][playerX + 1] != 3){
             if(board[playerY][playerX + 1] == 2){
-                if(playerX + 2 < board.length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
+                if(playerX + 2 < board[playerX].length && (board[playerY][playerX + 2] == 0 || board[playerY][playerX + 2] == 4)){
                     if(board[playerY][playerX + 2] == 4){
                         board[playerY][playerX + 2] = 5;
                         board[playerY][playerX + 1] = 0;
@@ -675,14 +795,14 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
                 }
             }
             else if(board[playerY][playerX + 1] == 5){
-                if(playerX + 2 < board.length && board[playerY][playerX + 2] == 0 ){
+                if(playerX + 2 < board[playerX].length && board[playerY][playerX + 2] == 0 ){
                     board[playerY][playerX + 2] = 2;
                     board[playerY][playerX + 1] = 4;
                     playerX++;
                     printBoard();
                     updateBoard();
                 }
-                if(playerY + 2 < board.length && board[playerY - 2][playerX] == 4 ){
+                if(playerX + 2 < board[playerX].length && board[playerY][playerX + 2] == 4 ){
                     board[playerY][playerX + 2] = 5;
                     board[playerY][playerX + 1] = 4;
                     playerX++;
@@ -698,7 +818,9 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
             }
         }
         if(e.getKeyCode() == 82){
-            this.getContentPane().remove(winMessage);
+            if(winMessage != null){
+                this.getContentPane().remove(winMessage);
+            }
             int[][] dab = new int[level.length][level[0].length];
             for(int i = 0; i < level.length; i++){
                 System.arraycopy(level[i], 0, dab[i], 0, level[0].length);
