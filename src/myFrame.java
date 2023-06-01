@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
 public class myFrame extends JFrame implements ActionListener, KeyListener {
     private JButton level1;
     private JButton level2;
@@ -40,6 +39,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         removeAllActionKeyListeners();
         this.getContentPane().removeAll();
         this.repaint();
+
         sokoban = new JLabel("Sokoban");
         start = new JButton("Play");
 
@@ -289,7 +289,7 @@ public class myFrame extends JFrame implements ActionListener, KeyListener {
         label.setIcon(box);
     }
     public void makeWallTile(int xCoord, int yCoord){
-        ImageIcon wall = new ImageIcon("wall.jpg");
+        ImageIcon wall = new ImageIcon("minecraftBrick2d50x50.jpg");
         JLabel label = new JLabel();
         game.add(label);
         label.setBounds(xCoord,yCoord,50,50);
